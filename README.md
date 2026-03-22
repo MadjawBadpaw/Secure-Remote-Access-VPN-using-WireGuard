@@ -189,9 +189,9 @@ ens37 (Host-only): connected to internal network (172.16.1.0/24)
 
 The server acts as a gateway between:
 
-External client network
-VPN tunnel network
-Internal private network
+External client network.
+VPN tunnel network.
+Internal private network.
 
 The internal Ubuntu machine is only connected to the host-only network and has no direct route to the external network.
 
@@ -230,13 +230,13 @@ This ensures that internal systems can respond to VPN clients even though they a
 
 ## Packet Flow
 
-When the VPN is inactive:
+### When the VPN is inactive:
 
 Kali attempts to access 172.16.1.10 by ping or SSH.
-No route exists
+No route exists.
 Communication fails
 
-When the VPN is active:
+### When the VPN is active:
 
 Kali sends traffic to 172.16.1.10
 Routing table directs traffic to wg0
