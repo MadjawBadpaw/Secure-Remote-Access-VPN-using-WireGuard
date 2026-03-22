@@ -41,6 +41,145 @@ Range: 10.10.0.0/24
 Used by:
 VPN Server (10.10.0.1)
 Kali Client (10.10.0.2)
+
+## Configurations
+
+This section includes the key configuration files used in the setup, covering network interfaces and WireGuard VPN configuration.
+
+### Netplan Configuration (VPN Server)
+
+File: /etc/netplan/*.yaml
+
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: true
+    ens37:
+      addresses:
+        - 172.16.1.1/24
+
+Explanation:
+
+ens33 is the bridged interface connected to the external network (DHCP)
+ens37 is the host-only interface for the internal network
+### Netplan Configuration (Internal Ubuntu)
+
+File: /etc/netplan/*.yaml
+
+network:
+  version: 2
+  ethernets:
+    ens33:
+      addresses:
+        - 172.16.1.10/24
+      routes:
+        - to: default
+          via: 172.16.1.1
+      nameservers:
+        addresses: [8.8.8.8]
+
+Explanation:
+
+Static IP assigned in internal network
+Default gateway points to VPN server (172.16.1.1)
+### WireGuard Configuration (Server)
+
+File: /etc/wireguard/wg0.conf
+
+[Interface]
+Address = 10.10.0.1/24
+PrivateKey = <SERVER_PRIVATE_KEY>
+ListenPort = 51820
+
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
+PostUp = iptables -A FORWARD -o wg0 -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+PostDown = iptables -D FORWARD -o wg0 -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o ens33 -j MASQUERADE
+
+[Peer]
+PublicKey = <KALI_PUBLIC_KEY>
+AllowedIPs = 10.10.0.2/32
+
+Explanation:
+
+Defines VPN interface and tunnel network
+Enables forwarding between VPN and internal network
+NAT ensures proper return path for packets
+Peer section defines the client
+### WireGuard Configuration (Kali Client)
+
+File: /etc/wireguard/wg0.conf
+
+[Interface]
+PrivateKey = <KALI_PRIVATE_KEY>
+Address = 10.10.0.2/24
+
+[Peer]
+PublicKey = <SERVER_PUBLIC_KEY>
+Endpoint = 10.229.64.x:51820
+AllowedIPs = 172.16.1.0/24
+PersistentKeepalive = 25
+
+Explanation:
+
+Assigns client VPN IP
+Defines server endpoint
+Routes internal network traffic through VPN
+### IP Forwarding (Server)
+
+File: /etc/sysctl.conf
+
+net.ipv4.ip_forward=1
+
+Apply using:
+
+sudo sysctl -p
+
+Explanation:
+
+Enables packet forwarding between interfaces
+Required for routing traffic from VPN to internal network
+#### Key Notes
+Replace all placeholder keys (<...>) with actual generated keys
+Ensure correct interface names (ens33, ens37) based on your system
+Configuration permissions for WireGuard should be restricted:
+sudo chmod 600 /etc/wireguard/wg0.conf
+
+### WireGuard Key Generation
+
+Keys are required to establish a secure connection between the server and client. Each system generates its own key pair consisting of a private key and a public key.
+
+#### On VPN Server
+wg genkey | tee server_private.key | wg pubkey > server_public.key
+
+View keys:
+
+cat server_private.key
+cat server_public.key
+server_private.key is used in the server configuration (PrivateKey)
+server_public.key is shared with the client
+#### On Kali Client
+wg genkey | tee client_private.key | wg pubkey > client_public.key
+
+View keys:
+
+cat client_private.key
+cat client_public.key
+client_private.key is used in client configuration
+client_public.key is added to server under [Peer]
+#### Key Usage Summary
+Server uses:
+its own private key
+client’s public key
+Client uses:
+its own private key
+server’s public key
+
+This exchange establishes trust and enables encrypted communication between both systems.
 ## System Architecture
 
 The VPN server is configured with two network interfaces:
