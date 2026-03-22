@@ -1,9 +1,9 @@
-#Secure Remote Access VPN using WireGuard
-##Introduction
+# Secure Remote Access VPN using WireGuard
+## Introduction
 
 This project demonstrates the implementation of a secure remote access mechanism using WireGuard VPN. The objective is to enable a remote client to access an isolated internal network through an encrypted tunnel. The setup reflects a typical enterprise scenario where internal systems are protected behind a gateway and are not directly exposed to external networks.
 
-##Components Used
+## Components Used
 
 The lab environment consists of three virtual machines:
 
@@ -13,7 +13,7 @@ Kali Linux (Remote Client)
 
 The virtualization platform used is VMware Workstation.
 
-##Network Configuration
+## Network Configuration
 
 The setup uses three different network segments:
 
@@ -41,7 +41,7 @@ Range: 10.10.0.0/24
 Used by:
 VPN Server (10.10.0.1)
 Kali Client (10.10.0.2)
-##System Architecture
+## System Architecture
 
 The VPN server is configured with two network interfaces:
 
@@ -66,7 +66,7 @@ Listening port: 51820
 NAT enabled using iptables
 Packet forwarding enabled
 
-###Peer configuration includes:
+### Peer configuration includes:
 
 Kali public key
 Allowed IP: 10.10.0.2/32
@@ -108,7 +108,7 @@ Response is routed back through the VPN server
 Encrypted response reaches Kali
 Verification
 
-##Commands used for validation:
+## Commands used for validation:
 
 Check VPN status:
 
@@ -133,10 +133,10 @@ Routing entries are dynamically added to direct traffic through the tunnel.
 The internal network remains isolated and cannot be accessed without VPN.
 The server successfully performs routing and NAT between different networks.
 
-Conclusion
+# Conclusion
 
 The project successfully demonstrates secure remote access to an isolated internal network using WireGuard VPN. The implementation highlights key networking concepts such as tunneling, routing, and network address translation. The VPN server functions as a gateway that enforces controlled and secure communication between external and internal systems.
 
-Summary
+# Summary
 
 A remote client is able to access an otherwise unreachable internal machine through an encrypted VPN tunnel, with proper routing and forwarding handled by a dual-interface Linux server.
