@@ -7,7 +7,7 @@ This project demonstrates the implementation of a secure remote access mechanism
 
 The lab environment consists of three virtual machines:
 
-Ubuntu Server (VPN Server and Gateway)
+Ubuntu Server named Wazuh (VPN Server and Gateway)
 Ubuntu Server (Internal Machine)
 Kali Linux (Remote Client)
 
@@ -26,7 +26,7 @@ Used by:
 Kali Linux
 VPN Server (interface: ens33)
 
-Internal Network (Host-Only – VMnet1)
+### Internal Network (Host-Only – VMnet1)
 This network is isolated and not accessible externally.
 
 Range: 172.16.1.0/24
@@ -34,7 +34,7 @@ Used by:
 VPN Server (interface: ens37 → 172.16.1.1)
 Internal Ubuntu Server (172.16.1.10)
 
-VPN Tunnel Network
+### VPN Tunnel Network
 This is the virtual network created by WireGuard.
 
 Range: 10.10.0.0/24
@@ -56,7 +56,7 @@ Internal private network
 
 The internal Ubuntu machine is only connected to the host-only network and has no direct route to the external network.
 
-WireGuard Configuration
+### WireGuard Configuration
 Server Configuration
 
 File: /etc/wireguard/wg0.conf
@@ -89,11 +89,11 @@ Perform NAT (MASQUERADE) on outgoing traffic
 
 This ensures that internal systems can respond to VPN clients even though they are in different subnets.
 
-##Packet Flow
+## Packet Flow
 
 When the VPN is inactive:
 
-Kali attempts to access 172.16.1.10
+Kali attempts to access 172.16.1.10 by ping or SSH.
 No route exists
 Communication fails
 
@@ -122,7 +122,7 @@ Check routing table:
 
 ip route
 
-Test connectivity:
+### Tests:
 
 ping 172.16.1.10
 ssh user@172.16.1.10
